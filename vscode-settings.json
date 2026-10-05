@@ -1,0 +1,19 @@
+{
+    // Copied by build.ps1 to build\vscode\data\user-data\User\settings.json
+    "python.defaultInterpreterPath": "C:\\Program Files\\Algoritmika\\python\\python.exe",
+    "python.terminal.executeInFileDir": true,
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.env.windows": {
+        // PyQt5 >= 5.15.4 keeps its plugins in Qt5\, not Qt\ (4.7 pointed at a folder that doesn't exist).
+        // Set explicitly so a global QT_* variable left by other Qt software can't hand PyQt5 a foreign qwindows.dll.
+        "QT_PLUGIN_PATH": "C:\\Program Files\\Algoritmika\\python\\Lib\\site-packages\\PyQt5\\Qt5\\plugins",
+        "QT_QPA_PLATFORM_PLUGIN_PATH": "C:\\Program Files\\Algoritmika\\python\\Lib\\site-packages\\PyQt5\\Qt5\\plugins\\platforms"
+    },
+    "extensions.ignoreRecommendations": true,
+    "extensions.autoCheckUpdates": false,
+    "extensions.autoUpdate": false,
+    "update.mode": "none",
+    "security.workspace.trust.enabled": false,
+    "workbench.startupEditor": "none",
+    "workbench.editor.enablePreview": false
+}
