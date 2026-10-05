@@ -70,6 +70,16 @@ New-Item -ItemType Directory "$root\build\vscode" | Out-Null
 & "$sys32\tar.exe" -xf $codeZip -C "$root\build\vscode"
 $userData = "$root\build\vscode\data\user-data"
 New-Item -ItemType Directory -Force "$userData\User" | Out-Null
+# Rebrand to AlgoVSCode: About, dialogs, window title (${appName}) and the taskbar app ID. product.json is not
+# covered by VS Code's integrity checksums, so this doesn't trigger "installation appears to be corrupt".
+# Code.exe itself (Alt+Tab icon, Task Manager name) stays untouched to keep Microsoft's signature.
+$product = Get-ChildItem "$root\build\vscode" -Recurse -Filter product.json | Where-Object FullName -match 'resources\\app\\product\.json$'
+$json = Get-Content $product.FullName -Raw
+@{ nameShort = 'AlgoVSCode'; nameLong = 'AlgoVSCode'; win32AppUserModelId = 'Algoritmika.AlgoVSCode' }.GetEnumerator() | ForEach-Object {
+    if ($json -notmatch "`"$($_.Key)`": `"[^`"]*`"") { throw "product.json has no $($_.Key)" }
+    $json = $json -replace "`"$($_.Key)`": `"[^`"]*`"", "`"$($_.Key)`": `"$($_.Value)`""
+}
+Set-Content $product.FullName $json -NoNewline
 $code = "$root\build\vscode\bin\code.cmd"
 & $code --install-extension "$root\extensions\$Algo"
 & $code --install-extension ms-python.python  # pulls debugpy, pylance, python-envs

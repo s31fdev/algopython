@@ -1,4 +1,4 @@
-﻿; Algoritmika Python installer. Built by build.ps1 (last step: tools\innosetup\ISCC.exe algopython.iss).
+﻿; AlgoVSCode installer (formerly Algoritmika Python). Built by build.ps1 (last step: tools\innosetup\ISCC.exe algopython.iss).
 ; Expects build\python (Python 3.13 with all libraries) and build\vscode (portable VS Code with data\).
 #define Ver "5.0.2"
 ; passed by build.ps1 (/DPyVer=... /DPyTag=...); defaults only for a manual compile
@@ -12,13 +12,13 @@
 [Setup]
 ; same AppId as 4.7, so Windows sees an upgrade, not a second app
 AppId={{E2D7C524-3019-44E3-A2B2-34D17FFAD95F}}
-AppName=Algoritmika Python
+AppName=AlgoVSCode
 AppVersion={#Ver}
 AppPublisher=Algoritmika
 ; the path is hardcoded in vscode\data\user-data\User\settings.json
 DefaultDirName={autopf}\Algoritmika
 DisableDirPage=yes
-DefaultGroupName=Algoritmika
+DefaultGroupName=AlgoVSCode
 DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -28,7 +28,7 @@ Compression=lzma2/ultra64
 SolidCompression=yes
 LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=4
-OutputBaseFilename=algopython-{#Ver}
+OutputBaseFilename=AlgoVSCode-{#Ver}
 SetupIconFile=assets\algovscode.ico
 UninstallDisplayIcon={app}\algovscode.ico
 
@@ -50,7 +50,7 @@ Source: "build\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs igno
 [Registry]
 ; PEP 514 registration. VS Code's Python extension finds interpreters through this key, not through
 ; PATH: without it students get "No Python found ... install uv". cleanup.ps1 (pre) wipes the old keys first.
-Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "DisplayName"; ValueData: "Python {#PyTag} (Algoritmika)"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "DisplayName"; ValueData: "Python {#PyTag} (AlgoVSCode)"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "SupportUrl"; ValueData: "https://www.python.org/"
 Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "Version"; ValueData: "{#PyVer}"
 Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "SysVersion"; ValueData: "{#PyTag}"
@@ -60,10 +60,10 @@ Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType
 Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType: string; ValueName: "WindowedExecutablePath"; ValueData: "{app}\python\pythonw.exe"
 
 [Icons]
-; same AppUserModelID as Code.exe (product.json win32AppUserModelId), so the taskbar button takes this
-; shortcut's icon too. Alt+Tab still shows the icon built into Code.exe.
-Name: "{group}\AlgoVSCode"; Filename: "{app}\vscode\Code.exe"; IconFilename: "{app}\algovscode.ico"; AppUserModelID: "Microsoft.VisualStudioCode"
-Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
+; same AppUserModelID that build.ps1 writes into product.json (win32AppUserModelId), so the taskbar button
+; takes this shortcut's name and icon. Alt+Tab still shows the icon built into Code.exe.
+Name: "{group}\AlgoVSCode"; Filename: "{app}\vscode\Code.exe"; IconFilename: "{app}\algovscode.ico"; AppUserModelID: "Algoritmika.AlgoVSCode"
+Name: "{group}\{cm:UninstallProgram,AlgoVSCode}"; Filename: "{uninstallexe}"
 
 [UninstallRun]
 Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\cleanup.ps1"" -Phase uninstall -AppDir ""{app}"""; Flags: runhidden; RunOnceId: "path"
@@ -85,7 +85,7 @@ end;
 procedure InitializeWizard;
 begin
   CleanupPage := CreateOutputProgressPage('Подготовка к установке',
-    'Удаляем прошлые версии Algoritmika Python и все версии Python. Это может занять несколько минут.');
+    'Удаляем прошлые версии AlgoVSCode и все версии Python. Это может занять несколько минут.');
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;

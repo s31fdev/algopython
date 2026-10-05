@@ -85,14 +85,14 @@ if ($Phase -eq 'pre') {
         "$env:ProgramFiles\Algoritmika", "${env:ProgramFiles(x86)}\Algoritmika",
         "$env:ProgramFiles\Python[0-9]*", "${env:ProgramFiles(x86)}\Python[0-9]*", "$env:SystemDrive\Python[0-9]*",
         "$env:ProgramData\anaconda3", "$env:ProgramData\miniconda3", "$env:ProgramData\miniforge3",
-        "$env:ProgramData\$start\Algoritmika", "$env:ProgramData\$start\Python *", "$env:ProgramData\$start\Anaconda*",
+        "$env:ProgramData\$start\Algoritmika", "$env:ProgramData\$start\AlgoVSCode", "$env:ProgramData\$start\Python *", "$env:ProgramData\$start\Anaconda*",
         "$env:SystemRoot\py.exe", "$env:SystemRoot\pyw.exe"
     ) + @($profiles | ForEach-Object {
         "$_\AppData\Local\Programs\Algoritmika", "$_\AppData\Local\Programs\Python", "$_\AppData\Local\Python",
         "$_\AppData\Roaming\Python", "$_\AppData\Local\pip", "$_\anaconda3", "$_\miniconda3", "$_\miniforge3",
         "$_\.conda", "$_\.condarc",
         "$_\AppData\Roaming\uv\python", "$_\.local\bin\python*.exe",  # uv-managed pythons and their shims, uv itself stays
-        "$_\AppData\Roaming\$start\Algoritmika", "$_\AppData\Roaming\$start\Python *", "$_\AppData\Roaming\$start\Anaconda*"
+        "$_\AppData\Roaming\$start\Algoritmika", "$_\AppData\Roaming\$start\AlgoVSCode", "$_\AppData\Roaming\$start\Python *", "$_\AppData\Roaming\$start\Anaconda*"
     }) + @($installDirs | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') } | Where-Object { (Split-Path $_ -Leaf) -match $SafeLeaf })
     Get-Item ($globs | Where-Object { $_ } | Sort-Object -Unique) -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force
 
