@@ -81,5 +81,5 @@ Get-ChildItem $userData -Force | Where-Object Name -ne 'User' | Remove-Item -Rec
 & $python "$root\smoke_test.py"
 & $python "$root\relocate.py" $Final
 
-& $iscc "$root\algopython.iss"
+& $iscc "/DPyVer=$PyVer" "/DPyTag=$($PyVer -replace '\.\d+$')" "$root\algopython.iss"
 Get-ChildItem "$root\Output\*.exe" | Select-Object Name, @{ n = 'MB'; e = { [int]($_.Length / 1MB) } }

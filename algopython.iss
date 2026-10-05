@@ -1,6 +1,13 @@
 ﻿; Algoritmika Python installer. Built by build.ps1 (last step: tools\innosetup\ISCC.exe algopython.iss).
 ; Expects build\python (Python 3.13 with all libraries) and build\vscode (portable VS Code with data\).
-#define Ver "5.0"
+#define Ver "5.0.1"
+; passed by build.ps1 (/DPyVer=... /DPyTag=...); defaults only for a manual compile
+#ifndef PyVer
+  #define PyVer "3.13.16"
+#endif
+#ifndef PyTag
+  #define PyTag "3.13"
+#endif
 
 [Setup]
 ; same AppId as 4.7, so Windows sees an upgrade, not a second app
@@ -36,6 +43,18 @@ Name: "{app}\vscode\data"; Permissions: users-modify
 Source: "cleanup.ps1"; Flags: dontcopy
 Source: "cleanup.ps1"; DestDir: "{app}"
 Source: "build\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+
+[Registry]
+; PEP 514 registration. VS Code's Python extension finds interpreters through this key, not through
+; PATH: without it students get "No Python found ... install uv". cleanup.ps1 (pre) wipes the old keys first.
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "DisplayName"; ValueData: "Python {#PyTag} (Algoritmika)"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "SupportUrl"; ValueData: "https://www.python.org/"
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "Version"; ValueData: "{#PyVer}"
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "SysVersion"; ValueData: "{#PyTag}"
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}"; ValueType: string; ValueName: "SysArchitecture"; ValueData: "64bit"
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType: string; ValueName: ""; ValueData: "{app}\python"
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType: string; ValueName: "ExecutablePath"; ValueData: "{app}\python\python.exe"
+Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType: string; ValueName: "WindowedExecutablePath"; ValueData: "{app}\python\pythonw.exe"
 
 [Icons]
 Name: "{group}\VSCode"; Filename: "{app}\vscode\Code.exe"
