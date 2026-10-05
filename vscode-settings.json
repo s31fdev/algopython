@@ -14,6 +14,11 @@
     "extensions.autoUpdate": false,
     "update.mode": "none",
     "security.workspace.trust.enabled": false,
+    // students' own work: no Copilot chat, completions or the right-hand chat panel
+    "chat.disableAIFeatures": true,
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    // VS Code's default title with the product name swapped
+    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}${separator}AlgoVSCode",
     "workbench.startupEditor": "none",
     "workbench.editor.enablePreview": false
 }

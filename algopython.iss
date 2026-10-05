@@ -1,6 +1,6 @@
 ﻿; Algoritmika Python installer. Built by build.ps1 (last step: tools\innosetup\ISCC.exe algopython.iss).
 ; Expects build\python (Python 3.13 with all libraries) and build\vscode (portable VS Code with data\).
-#define Ver "5.0.1"
+#define Ver "5.0.2"
 ; passed by build.ps1 (/DPyVer=... /DPyTag=...); defaults only for a manual compile
 #ifndef PyVer
   #define PyVer "3.13.16"
@@ -29,6 +29,8 @@ SolidCompression=yes
 LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=4
 OutputBaseFilename=algopython-{#Ver}
+SetupIconFile=assets\algovscode.ico
+UninstallDisplayIcon={app}\algovscode.ico
 
 [Languages]
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -42,6 +44,7 @@ Name: "{app}\vscode\data"; Permissions: users-modify
 [Files]
 Source: "cleanup.ps1"; Flags: dontcopy
 Source: "cleanup.ps1"; DestDir: "{app}"
+Source: "assets\algovscode.ico"; DestDir: "{app}"
 Source: "build\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Registry]
@@ -57,7 +60,9 @@ Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType
 Root: HKLM; Subkey: "SOFTWARE\Python\PythonCore\{#PyTag}\InstallPath"; ValueType: string; ValueName: "WindowedExecutablePath"; ValueData: "{app}\python\pythonw.exe"
 
 [Icons]
-Name: "{group}\VSCode"; Filename: "{app}\vscode\Code.exe"
+; same AppUserModelID as Code.exe (product.json win32AppUserModelId), so the taskbar button takes this
+; shortcut's icon too. Alt+Tab still shows the icon built into Code.exe.
+Name: "{group}\AlgoVSCode"; Filename: "{app}\vscode\Code.exe"; IconFilename: "{app}\algovscode.ico"; AppUserModelID: "Microsoft.VisualStudioCode"
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
 
 [UninstallRun]
