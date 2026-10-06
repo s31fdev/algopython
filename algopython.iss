@@ -1,6 +1,6 @@
 ﻿; AlgoVSCode installer (formerly Algoritmika Python). Built by build.ps1 (last step: tools\innosetup\ISCC.exe algopython.iss).
 ; Expects build\python (Python 3.13 with all libraries) and build\vscode (portable VS Code with data\).
-#define Ver "5.0.2"
+#define Ver "5.0.3"
 ; passed by build.ps1 (/DPyVer=... /DPyTag=...); defaults only for a manual compile
 #ifndef PyVer
   #define PyVer "3.13.16"
