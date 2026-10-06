@@ -92,6 +92,12 @@ if (Test-Path "$ext\.obsolete") {
     (Get-Content "$ext\.obsolete" -Raw | ConvertFrom-Json).PSObject.Properties.Name | ForEach-Object { Remove-Item "$ext\$_" -Recurse -Force }
     Remove-Item "$ext\.obsolete"
 }
+# ms-python passes Jedi `semantic_tokens: {enable: true}`, but jedi-language-server only reads the camelCase
+# `semanticTokens`, so semantic highlighting (modules, classes, functions coloured) silently stays off.
+$client = Get-ChildItem $ext -Recurse -Filter extension.js | Where-Object FullName -match 'ms-python\.python-[^\\]+\\out\\client\\extension\.js$'
+$js = [IO.File]::ReadAllText($client.FullName)
+if (-not $js.Contains('semantic_tokens:{enable:!0}')) { throw "ms-python changed its Jedi options; recheck the semanticTokens patch" }
+[IO.File]::WriteAllText($client.FullName, $js.Replace('semantic_tokens:{enable:!0}', 'semanticTokens:{enable:!0}'))
 Copy-Item "$root\vscode-settings.json" "$userData\User\settings.json"
 # caches, logs and machineid must not be shipped to every student
 Get-ChildItem $userData -Force | Where-Object Name -ne 'User' | Remove-Item -Recurse -Force
