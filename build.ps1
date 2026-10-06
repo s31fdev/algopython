@@ -84,9 +84,14 @@ $code = "$root\build\vscode\bin\code.cmd"
 & $code --install-extension "$root\extensions\$Algo"
 & $code --install-extension ms-python.python  # pulls debugpy, pylance, python-envs
 # Pylance checks env.appName == "Visual Studio Code" and silently stays off in AlgoVSCode (no completions);
-# basedpyright is the open-source Pyright fork with the same completions and no such check.
+# vscode-settings.json switches the Python extension to its bundled Jedi instead.
 & $code --uninstall-extension ms-python.vscode-pylance
-& $code --install-extension detachhead.basedpyright
+# --uninstall-extension only lists the folder in .obsolete for VS Code to delete on next start; delete it now
+$ext = "$root\build\vscode\data\extensions"
+if (Test-Path "$ext\.obsolete") {
+    (Get-Content "$ext\.obsolete" -Raw | ConvertFrom-Json).PSObject.Properties.Name | ForEach-Object { Remove-Item "$ext\$_" -Recurse -Force }
+    Remove-Item "$ext\.obsolete"
+}
 Copy-Item "$root\vscode-settings.json" "$userData\User\settings.json"
 # caches, logs and machineid must not be shipped to every student
 Get-ChildItem $userData -Force | Where-Object Name -ne 'User' | Remove-Item -Recurse -Force
