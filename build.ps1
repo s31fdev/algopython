@@ -98,12 +98,21 @@ $client = Get-ChildItem $ext -Recurse -Filter extension.js | Where-Object FullNa
 $js = [IO.File]::ReadAllText($client.FullName)
 if (-not $js.Contains('semantic_tokens:{enable:!0}')) { throw "ms-python changed its Jedi options; recheck the semanticTokens patch" }
 [IO.File]::WriteAllText($client.FullName, $js.Replace('semantic_tokens:{enable:!0}', 'semanticTokens:{enable:!0}'))
+# jedi-language-server computes semantic tokens on a worker thread; Jedi isn't thread-safe, so under normal
+# typing the shared helper process gets garbled and the server stops answering (no completions, "Loading...").
+# Run those handlers on the main thread like all the others. jedi_check.py proves it under editor-like load.
+$jls = Get-ChildItem $ext -Recurse -Filter server.py | Where-Object FullName -match 'jedilsp\\jedi_language_server\\server\.py$'
+$py = [IO.File]::ReadAllText($jls.FullName)
+$threaded = '@SERVER\.thread\(\)(\r?\n)def semantic_tokens_'
+if ([regex]::Matches($py, $threaded).Count -ne 2) { throw "jedi-language-server changed its semantic token handlers; recheck the thread patch" }
+[IO.File]::WriteAllText($jls.FullName, [regex]::Replace($py, $threaded, '# jedi is not thread-safe: run on the main thread like every other handler$1def semantic_tokens_'))
 Copy-Item "$root\vscode-settings.json" "$userData\User\settings.json"
 # caches, logs and machineid must not be shipped to every student
 Get-ChildItem $userData -Force | Where-Object Name -ne 'User' | Remove-Item -Recurse -Force
 
 # --- check, then point pip's .exe launchers at the install location (they stop working from build\)
 & $python "$root\smoke_test.py"
+& $python "$root\jedi_check.py"
 & $python "$root\relocate.py" $Final
 
 & $iscc "/DPyVer=$PyVer" "/DPyTag=$($PyVer -replace '\.\d+$')" "$root\algopython.iss"
